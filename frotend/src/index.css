@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply min-h-screen bg-linear-to-b from-gray-50 via-blue-50/40 to-emerald-50/30 text-slate-800 antialiased;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+}
