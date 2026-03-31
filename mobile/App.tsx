@@ -1,3 +1,4 @@
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo, useState } from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -5,6 +6,7 @@ import { AnalyzeScreen } from './screens/AnalyzeScreen';
 import { HabitScreen } from './screens/HabitScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { RecommendationScreen } from './screens/RecommendationScreen';
+import { ScanScreen } from './screens/ScanScreen';
 import type { AppScreen, HabitAnswers } from './screens/types';
 import './global.css';
 
@@ -43,7 +45,9 @@ export default function App() {
   const renderScreen = () => {
     switch (currentScreen) {
       case 'home':
-        return <HomeScreen onStartAssessment={() => setCurrentScreen('habit')} />;
+        return <HomeScreen onStartAssessment={() => setCurrentScreen('habit')} onScan={() => setCurrentScreen('scan')} />;
+      case 'scan':
+        return <ScanScreen onBack={() => setCurrentScreen('home')} />;
       case 'habit':
         return (
           <HabitScreen
@@ -64,7 +68,7 @@ export default function App() {
       case 'plan':
         return <RecommendationScreen onBack={() => setCurrentScreen('analyze')} />;
       default:
-        return <HomeScreen onStartAssessment={() => setCurrentScreen('habit')} />;
+        return <HomeScreen onStartAssessment={() => setCurrentScreen('habit')} onScan={() => setCurrentScreen('scan')} />;
     }
   };
 

@@ -1,18 +1,31 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 import { GradientButton } from '../components/ui/GradientButton';
+import React from 'react';
+
+type Language = 'en' | 'th' | 'my';
+
+const translations = {
+  en: { name: 'English', flag: '🇬🇧' },
+  th: { name: 'ภาษาไทย', flag: '🇹🇭' },
+  my: { name: 'မြန်မာ', flag: '🇲🇲' },
+};
 
 type HomeScreenProps = {
   onStartAssessment: () => void;
+  onScan: () => void;
 };
 
-export function HomeScreen({ onStartAssessment }: HomeScreenProps) {
+export function HomeScreen({ onStartAssessment, onScan }: HomeScreenProps) {
   const [fontsLoaded] = useFonts({
     PlaywriteIE_400Regular: require('../assets/fonts/PlaywriteIE_400Regular.ttf'),
   });
+
+  const [selectedLang, setSelectedLang] = useState<Language>('en');
+  const [showLangModal, setShowLangModal] = useState(false);
 
   const [activities, setActivities] = useState([
     { id: 'walk', label: 'Walk 30 mins', done: false },
@@ -47,9 +60,18 @@ export function HomeScreen({ onStartAssessment }: HomeScreenProps) {
             </Text>
           </View>
 
-          <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-slate-200">
-            <MaterialCommunityIcons name="account-outline" size={20} color="#334155" />
-          </Pressable>
+          <View className="flex-row items-center gap-2">
+            <Pressable 
+              onPress={() => setShowLangModal(true)}
+              className="h-10 flex-row items-center gap-1 rounded-full bg-slate-200 px-3"
+            >
+              <Text className="text-base">{translations[selectedLang].flag}</Text>
+              <MaterialCommunityIcons name="chevron-down" size={16} color="#334155" />
+            </Pressable>
+            <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-slate-200">
+              <MaterialCommunityIcons name="account-outline" size={20} color="#334155" />
+            </Pressable>
+          </View>
         </View>
 
         {/* CAROUSEL */}
@@ -61,7 +83,10 @@ export function HomeScreen({ onStartAssessment }: HomeScreenProps) {
 
           {/* Card 1 */}
           <View className="mr-3 w-72 rounded-2xl bg-blue-100 p-4">
-            <Text className="text-sm font-semibold text-blue-500">💡 Tip</Text>
+            <View className="flex-row items-center gap-1 mb-1">
+              <MaterialCommunityIcons name="lightbulb-outline" size={14} color="#3b82f6" />
+              <Text className="text-sm font-semibold text-blue-500">Tip</Text>
+            </View>
             <Text className="mt-1 text-lg font-bold text-blue-700">
               Drink more water today
             </Text>
@@ -78,7 +103,10 @@ export function HomeScreen({ onStartAssessment }: HomeScreenProps) {
 
           {/* Card 2 */}
           <View className="w-72 rounded-2xl bg-emerald-100 p-4">
-            <Text className="text-sm font-semibold text-emerald-600">📊 Progress</Text>
+            <View className="flex-row items-center gap-1 mb-1">
+              <MaterialCommunityIcons name="chart-line" size={14} color="#059669" />
+              <Text className="text-sm font-semibold text-emerald-600">Progress</Text>
+            </View>
             <Text className="mt-1 text-lg font-bold text-emerald-700">
               You improved 12%
             </Text>
@@ -135,9 +163,10 @@ export function HomeScreen({ onStartAssessment }: HomeScreenProps) {
 
         {/* AI ACTIVITIES */}
         <View className="mb-4 rounded-2xl bg-white p-4">
-          <Text className="mb-3 text-base font-semibold text-slate-800">
-            🤖 Suggested for You
-          </Text>
+          <View className="mb-3 flex-row items-center gap-2">
+            <MaterialCommunityIcons name="robot-outline" size={18} color="#64748b" />
+            <Text className="text-base font-semibold text-slate-800">Suggested for You</Text>
+          </View>
 
           <View className="gap-2">
             {activities.map((item) => (
@@ -163,6 +192,43 @@ export function HomeScreen({ onStartAssessment }: HomeScreenProps) {
           </View>
         </View>
 
+        {/* AI SCAN SECTION */}
+        <View className="mb-4 rounded-2xl bg-white p-4">
+          <View className="mb-3 flex-row items-center gap-2">
+            <MaterialCommunityIcons name="line-scan" size={20} color="#0284c7" />
+            <Text className="text-base font-bold text-slate-800">AI Image Scanner</Text>
+          </View>
+          <Text className="mb-4 text-sm text-slate-500">
+            Detect diabetic risk indicators instantly using your camera or a photo from your gallery.
+          </Text>
+
+          <View className="flex-row gap-3">
+            {/* Camera Scan */}
+            <Pressable
+              onPress={onScan}
+              className="flex-1 rounded-xl bg-blue-50 p-3"
+            >
+              <View className="mb-2 h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+                <MaterialCommunityIcons name="camera" size={20} color="#0284c7" />
+              </View>
+              <Text className="text-sm font-semibold text-blue-700">Camera</Text>
+              <Text className="text-xs text-blue-500">Take a photo</Text>
+            </Pressable>
+
+            {/* Gallery Scan */}
+            <Pressable
+              onPress={onScan}
+              className="flex-1 rounded-xl bg-emerald-50 p-3"
+            >
+              <View className="mb-2 h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
+                <MaterialCommunityIcons name="image" size={20} color="#059669" />
+              </View>
+              <Text className="text-sm font-semibold text-emerald-700">Gallery</Text>
+              <Text className="text-xs text-emerald-500">Upload image</Text>
+            </Pressable>
+          </View>
+        </View>
+
         {/* PROGRESS */}
         <View className="mb-4 rounded-2xl bg-white p-4">
           <Text className="text-sm font-semibold text-slate-800">
@@ -183,13 +249,58 @@ export function HomeScreen({ onStartAssessment }: HomeScreenProps) {
 
       </ScrollView>
 
-      {/* 🔥 STICKY CTA */}
+      {/* STICKY CTA */}
       <View className="absolute bottom-0 left-0 right-0 bg-gray-100 px-4 pb-6 pt-2">
         <GradientButton
           title="Start Health Check"
           onPress={onStartAssessment}
         />
       </View>
+
+      {/* Language Selector Modal */}
+      <Modal
+        visible={showLangModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowLangModal(false)}
+      >
+        <Pressable 
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}
+          onPress={() => setShowLangModal(false)}
+        >
+          <Pressable style={{ width: '80%', backgroundColor: '#fff', borderRadius: 20, padding: 20 }} onPress={() => {}}>
+            <Text className="mb-4 text-lg font-bold text-slate-800 text-center">Select Language</Text>
+            <View className="gap-3">
+              {(Object.keys(translations) as Language[]).map((lang) => (
+                <Pressable
+                  key={lang}
+                  onPress={() => {
+                    setSelectedLang(lang);
+                    setShowLangModal(false);
+                  }}
+                  className={`flex-row items-center gap-3 rounded-xl p-4 ${
+                    selectedLang === lang ? 'bg-blue-50 border border-blue-200' : 'bg-slate-50'
+                  }`}
+                >
+                  <Text className="text-2xl">{translations[lang].flag}</Text>
+                  <Text className={`text-base font-semibold ${selectedLang === lang ? 'text-blue-600' : 'text-slate-700'}`}>
+                    {translations[lang].name}
+                  </Text>
+                  {selectedLang === lang && (
+                    <MaterialCommunityIcons name="check-circle" size={20} color="#3b82f6" className="ml-auto" />
+                  )}
+                </Pressable>
+              ))}
+            </View>
+            <Pressable 
+              onPress={() => setShowLangModal(false)}
+              className="mt-4 items-center"
+            >
+              <Text className="text-sm font-semibold text-slate-500">Cancel</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
