@@ -1,17 +1,15 @@
 type ProgressBarProps = {
   value: number
+  color?: string
 }
 
-export default function ProgressBar({ value }: ProgressBarProps) {
+export default function ProgressBar({ value, color = 'bg-blue-600' }: ProgressBarProps) {
   return (
-    <div className="mb-4">
-      <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
-        <div
-          className="h-full rounded-full bg-linear-to-r from-blue-500 to-blue-600 transition-all duration-500"
-          style={{ width: `${value}%` }}
-        />
-      </div>
-      <div className="mt-1 text-right text-xs font-medium text-slate-500">{value}%</div>
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+      <div
+        className={`h-full rounded-full transition-all duration-500 ${color}`}
+        style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+      />
     </div>
   )
 }

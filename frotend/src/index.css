@@ -1,11 +1,72 @@
 @import "tailwindcss";
 
+/* ── Google Fonts ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Myanmar:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+
+/* ── Font stacks per language ─────────────────────────────── */
+:root                  { --app-font: 'Inter', system-ui, -apple-system, sans-serif; }
+[data-lang='my'] :root { --app-font: 'Noto Sans Myanmar', sans-serif; }
+[data-lang='th'] :root { --app-font: 'Noto Sans Thai', sans-serif; }
+
+/* Apply to html so the cascade picks up data-lang on <html> */
+html                 { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+[data-lang='my']     { font-family: 'Noto Sans Myanmar', sans-serif; }
+[data-lang='th']     { font-family: 'Noto Sans Thai', sans-serif; }
+
 @layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
   body {
-    @apply min-h-screen bg-linear-to-b from-gray-50 via-blue-50/40 to-emerald-50/30 text-slate-800 antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    @apply min-h-screen bg-slate-50 text-slate-900 antialiased;
   }
 
-  #root {
-    @apply min-h-screen;
+  #root { @apply min-h-screen; }
+
+  h1, h2, h3, h4 { @apply font-semibold tracking-tight; }
+}
+
+@layer utilities {
+  /* ── Range slider ── */
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 5px;
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+    border: none;
   }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #2563eb;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #2563eb40;
+    transition: box-shadow 0.15s;
+  }
+  .slider::-webkit-slider-thumb:hover { box-shadow: 0 0 0 5px #2563eb20; }
+  .slider::-moz-range-thumb {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #2563eb;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #2563eb40;
+  }
+
+  /* ── Scrollbar hide ── */
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+  /* ── SaaS card ── */
+  .card {
+    @apply bg-white rounded-xl border border-slate-200 shadow-sm;
+  }
+
+  /* ── Risk badges ── */
+  .badge-high   { @apply bg-red-50 text-red-600 border border-red-100; }
+  .badge-mod    { @apply bg-amber-50 text-amber-600 border border-amber-100; }
+  .badge-low    { @apply bg-emerald-50 text-emerald-600 border border-emerald-100; }
 }
