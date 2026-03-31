@@ -1,4 +1,4 @@
-export type AppScreen = 'home' | 'habit' | 'analyze' | 'plan';
+export type AppScreen = 'home' | 'habit' | 'analyze' | 'plan' | 'scan';
 
 export type HabitAnswers = {
   Pregnancies: number;

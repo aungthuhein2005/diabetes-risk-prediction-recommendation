@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image, ScrollView, Text, View } from 'react-native';
 import { Card } from '../components/ui/Card';
 import { GradientButton } from '../components/ui/GradientButton';
+import React from 'react';
 
 type OnBoardScreenProps = {
   onNext: () => void;

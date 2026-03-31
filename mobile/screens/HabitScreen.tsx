@@ -1,9 +1,10 @@
 import Slider from '@react-native-community/slider';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Card } from '../components/ui/Card';
 import { GradientButton } from '../components/ui/GradientButton';
 import type { HabitAnswers } from './types';
-import { ChevronLeft } from 'lucide-react-native';
+import React from 'react';
 
 type HabitScreenProps = {
   answers: HabitAnswers;
@@ -25,7 +26,7 @@ export function HabitScreen({ answers, onAnswersChange, onAnalyze, onBack }: Hab
             <Pressable
               onPress={onBack}
               className="h-8 w-8 items-center justify-center rounded-full bg-slate-200/50">
-              <ChevronLeft size={18} color="#64748b" />
+              <MaterialCommunityIcons name="chevron-left" size={20} color="#64748b" />
             </Pressable>
             <View className="flex-1 pr-8">
               <Text className="text-center text-2xl font-bold text-slate-900">
@@ -37,9 +38,10 @@ export function HabitScreen({ answers, onAnswersChange, onAnalyze, onBack }: Hab
           <View className="gap-3">
             {featureSections.map((section) => (
               <View key={section.title} className="mt-1">
-                <Text className="mb-2 text-base font-bold text-slate-700">
-                  {section.emoji} {section.title}
-                </Text>
+                <View className="mb-2 flex-row items-center gap-2">
+                  <MaterialCommunityIcons name={section.icon as any} size={18} color="#64748b" />
+                  <Text className="text-base font-bold text-slate-700">{section.title}</Text>
+                </View>
 
                 <View className="gap-3">
                   {section.fields.map((field) => (
@@ -53,7 +55,7 @@ export function HabitScreen({ answers, onAnswersChange, onAnalyze, onBack }: Hab
                       step={field.step}
                       unit={field.unit}
                       normalRange={field.normalRange}
-                      emoji={field.emoji}
+                      icon={field.icon}
                       onChangeValue={(value) => updateNumber(field.key, value)}
                     />
                   ))}
@@ -80,7 +82,7 @@ type FeatureFieldProps = {
   step: number;
   unit?: string;
   normalRange: string;
-  emoji: string;
+  icon: string;
   onChangeValue: (value: number) => void;
 };
 
@@ -93,7 +95,7 @@ function FeatureField({
   step,
   unit,
   normalRange,
-  emoji,
+  icon,
   onChangeValue,
 }: FeatureFieldProps) {
   const displayValue = Number.isInteger(value) ? value.toString() : value.toFixed(2);
@@ -101,9 +103,10 @@ function FeatureField({
   return (
     <View className="rounded-2xl border border-slate-100 bg-white px-3 py-3 shadow-sm">
       <View className="mb-2 flex-row items-center justify-between">
-        <Text className="text-sm font-bold text-slate-800">
-          {emoji} {label}
-        </Text>
+        <View className="flex-row items-center gap-2">
+          <MaterialCommunityIcons name={icon as any} size={16} color="#64748b" />
+          <Text className="text-sm font-bold text-slate-800">{label}</Text>
+        </View>
         <Text className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-600">
           {displayValue}
           {unit ? ` ${unit}` : ''}
@@ -130,7 +133,7 @@ function FeatureField({
 
 const featureSections: {
   title: string;
-  emoji: string;
+  icon: string;
   fields: {
     key: keyof HabitAnswers;
     label: string;
@@ -140,12 +143,12 @@ const featureSections: {
     step: number;
     unit?: string;
     normalRange: string;
-    emoji: string;
+    icon: string;
   }[];
 }[] = [
   {
     title: 'Personal',
-    emoji: '🧬',
+    icon: 'account-cog',
     fields: [
       {
         key: 'Age',
@@ -156,7 +159,7 @@ const featureSections: {
         step: 1,
         unit: 'yrs',
         normalRange: '18 - 60 years',
-        emoji: '👤',
+        icon: 'account',
       },
       {
         key: 'Pregnancies',
@@ -166,13 +169,13 @@ const featureSections: {
         max: 15,
         step: 1,
         normalRange: '0 - 6',
-        emoji: '🤰',
+        icon: 'baby-carriage',
       },
     ],
   },
   {
     title: 'Vitals',
-    emoji: '❤️',
+    icon: 'heart-pulse',
     fields: [
       {
         key: 'Glucose',
@@ -183,7 +186,7 @@ const featureSections: {
         step: 1,
         unit: 'mg/dL',
         normalRange: '70 - 140 mg/dL',
-        emoji: '🩸',
+        icon: 'water',
       },
       {
         key: 'BloodPressure',
@@ -194,7 +197,7 @@ const featureSections: {
         step: 1,
         unit: 'mmHg',
         normalRange: '60 - 90 mmHg',
-        emoji: '🫀',
+        icon: 'heart',
       },
       {
         key: 'Insulin',
@@ -205,13 +208,13 @@ const featureSections: {
         step: 1,
         unit: 'mu U/ml',
         normalRange: '16 - 166 mu U/ml',
-        emoji: '💉',
+        icon: 'needle',
       },
     ],
   },
   {
     title: 'Body Metrics',
-    emoji: '📊',
+    icon: 'chart-bar',
     fields: [
       {
         key: 'BMI',
@@ -221,7 +224,7 @@ const featureSections: {
         max: 60,
         step: 0.1,
         normalRange: '18.5 - 24.9',
-        emoji: '⚖️',
+        icon: 'scale-bathroom',
       },
       {
         key: 'SkinThickness',
@@ -232,13 +235,13 @@ const featureSections: {
         step: 1,
         unit: 'mm',
         normalRange: '10 - 40 mm',
-        emoji: '📏',
+        icon: 'ruler',
       },
     ],
   },
   {
     title: 'Risk Factor',
-    emoji: '🧪',
+    icon: 'flask',
     fields: [
       {
         key: 'DiabetesPedigreeFunction',
@@ -248,7 +251,7 @@ const featureSections: {
         max: 2.5,
         step: 0.01,
         normalRange: '0.1 - 0.8',
-        emoji: '🧬',
+        icon: 'dna',
       },
     ],
   },

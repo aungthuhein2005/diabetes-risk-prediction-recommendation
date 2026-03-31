@@ -1,18 +1,11 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card } from '../components/ui/Card';
 import { GradientButton } from '../components/ui/GradientButton';
-import {
-  ChevronLeft,
-  CircleAlert,
-  Download,
-  HeartPulse,
-  ListChecks,
-  Save,
-  Stethoscope,
-} from 'lucide-react-native';
 import { downloadRecommendationPdf } from '../utils/pdfGenerator';
+import React from 'react';
 
 type RecommendationScreenProps = {
   onBack: () => void;
@@ -53,7 +46,7 @@ export function RecommendationScreen({ onBack }: RecommendationScreenProps) {
             <Pressable
               onPress={onBack}
               className="h-8 w-8 items-center justify-center rounded-full bg-slate-200/50">
-              <ChevronLeft size={18} color="#64748b" />
+              <MaterialCommunityIcons name="chevron-left" size={20} color="#64748b" />
             </Pressable>
             <View className="flex-1 pr-8">
               <Text className="text-center text-2xl font-bold text-slate-900">
@@ -91,13 +84,13 @@ export function RecommendationScreen({ onBack }: RecommendationScreenProps) {
 
         <SectionCard
           title="Explanation"
-          icon={<CircleAlert size={18} color="#2563eb" />}
+          icon={<MaterialCommunityIcons name="alert-circle" size={18} color="#2563eb" />}
           content="Your risk level is high due to elevated glucose, insulin, and age. These are early warning indicators linked to diabetes and related metabolic conditions. It is not a confirmed diagnosis, but taking action now can protect long-term health."
         />
 
         <SectionCard
           title="Action Plan"
-          icon={<ListChecks size={18} color="#0891b2" />}
+          icon={<MaterialCommunityIcons name="format-list-checks" size={18} color="#0891b2" />}
           bulletItems={[
             'Monitor blood sugar and blood pressure regularly.',
             'Stay hydrated to support kidney and metabolic function.',
@@ -108,7 +101,7 @@ export function RecommendationScreen({ onBack }: RecommendationScreenProps) {
 
         <SectionCard
           title="Lifestyle"
-          icon={<HeartPulse size={18} color="#16a34a" />}
+          icon={<MaterialCommunityIcons name="heart-pulse" size={18} color="#16a34a" />}
           bulletItems={[
             'Diet: Focus on whole foods and reduce refined sugars.',
             'Exercise: Aim for 30-60 minutes of moderate activity most days.',
@@ -119,7 +112,7 @@ export function RecommendationScreen({ onBack }: RecommendationScreenProps) {
 
         <SectionCard
           title="Doctor Advice"
-          icon={<Stethoscope size={18} color="#7c3aed" />}
+          icon={<MaterialCommunityIcons name="stethoscope" size={18} color="#7c3aed" />}
           content="Consult a healthcare provider for confirmatory tests such as HbA1c and lipid panel. A personalized medical plan can reduce complications and improve long-term outcomes."
           footerText="Note: This guidance is not a diagnosis. Always consult a qualified healthcare professional for individualized care."
         />
@@ -128,13 +121,13 @@ export function RecommendationScreen({ onBack }: RecommendationScreenProps) {
       <View className="absolute bottom-0 left-0 right-0 gap-2 bg-gray-100 px-4 pb-6 pt-2">
         <GradientButton variant="secondary" className="w-full">
           <View className="flex-row items-center gap-2">
-            <Save size={16} color="#ffffff" />
+            <MaterialCommunityIcons name="content-save" size={16} color="#ffffff" />
             <Text className="text-sm font-semibold text-white">Save Plan</Text>
           </View>
         </GradientButton>
         <GradientButton variant="primary" className="mt-1" onPress={handleDownloadPdf}>
           <View className="flex-row items-center gap-2">
-            <Download size={16} color="#ffffff" />
+            <MaterialCommunityIcons name="download" size={16} color="#ffffff" />
             <Text className="text-sm font-semibold text-white">
               {isDownloading ? 'Generating PDF...' : 'Download PDF'}
             </Text>
@@ -166,9 +159,10 @@ function SectionCard({ title, icon, content, bulletItems, footerText }: SectionC
       {bulletItems ? (
         <View className="gap-2">
           {bulletItems.map((item) => (
-            <Text key={item} className="text-sm leading-6 text-slate-700">
-              {'\u2022'} {item}
-            </Text>
+            <View key={item} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}>
+              <MaterialCommunityIcons name="circle-small" size={20} color="#64748b" style={{ marginTop: 2 }} />
+              <Text className="flex-1 text-sm leading-6 text-slate-700">{item}</Text>
+            </View>
           ))}
         </View>
       ) : null}

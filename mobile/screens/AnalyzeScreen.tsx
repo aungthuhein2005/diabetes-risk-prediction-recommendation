@@ -1,6 +1,7 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { GradientButton } from '../components/ui/GradientButton';
-import { ChevronLeft } from 'lucide-react-native';
+import React from 'react';
 
 type AnalyzeScreenProps = {
   analysisPercent: number;
@@ -19,7 +20,7 @@ export function AnalyzeScreen({ analysisPercent, onViewPlan, onRetake }: Analyze
   const segmentHeight = 18;
   const center = chartSize / 2;
 
-  // 🔥 Dynamic risk state
+  // Dynamic risk state
   const risk =
     clampedPercent > 65
       ? { label: 'High Risk', bg: 'bg-rose-100', text: 'text-rose-600', stroke: '#f43f5e' }
@@ -36,7 +37,7 @@ export function AnalyzeScreen({ analysisPercent, onViewPlan, onRetake }: Analyze
           <Pressable
             onPress={onRetake}
             className="h-9 w-9 items-center justify-center rounded-full bg-slate-200/50">
-            <ChevronLeft size={18} color="#64748b" />
+            <MaterialCommunityIcons name="chevron-left" size={20} color="#64748b" />
           </Pressable>
 
           <View className="flex-1 pr-8">
@@ -86,9 +87,12 @@ export function AnalyzeScreen({ analysisPercent, onViewPlan, onRetake }: Analyze
           </View>
         </View>
 
-        {/* 🧠 INSIGHT CARD */}
+        {/* INSIGHT CARD */}
         <View className="mb-4 rounded-2xl bg-white p-4">
-          <Text className="mb-2 text-base font-semibold text-slate-800">🧠 What this means</Text>
+          <View className="mb-2 flex-row items-center gap-2">
+            <MaterialCommunityIcons name="brain" size={18} color="#64748b" />
+            <Text className="text-base font-semibold text-slate-800">What this means</Text>
+          </View>
           <Text className="text-sm leading-6 text-slate-600">
             Your results indicate a higher likelihood of developing health risks related to blood
             sugar and metabolism. This doesn’t mean a diagnosis, but it’s a strong signal to take
@@ -96,28 +100,32 @@ export function AnalyzeScreen({ analysisPercent, onViewPlan, onRetake }: Analyze
           </Text>
         </View>
 
-        {/* ⚡ QUICK ACTIONS */}
+        {/* QUICK ACTIONS */}
         <View className="mb-4 rounded-2xl bg-white p-4">
-          <Text className="mb-3 text-base font-semibold text-slate-800">
-            ⚡ What you can do now
-          </Text>
+          <View className="mb-3 flex-row items-center gap-2">
+            <MaterialCommunityIcons name="lightning-bolt" size={18} color="#64748b" />
+            <Text className="text-base font-semibold text-slate-800">What you can do now</Text>
+          </View>
 
           <View className="gap-2">
             {[
-              'Reduce sugar intake',
-              'Exercise 30 mins daily',
-              'Drink more water',
-              'Improve sleep habits',
+              { icon: 'candy-off',          color: '#ef4444', bg: '#fee2e2', label: 'Reduce sugar intake' },
+              { icon: 'run-fast',            color: '#f59e0b', bg: '#fef3c7', label: 'Exercise 30 mins daily' },
+              { icon: 'water-outline',       color: '#0284c7', bg: '#e0f2fe', label: 'Drink more water' },
+              { icon: 'sleep',               color: '#8b5cf6', bg: '#ede9fe', label: 'Improve sleep habits' },
             ].map((item) => (
-              <View key={item} className="rounded-xl bg-slate-50 px-3 py-3">
-                <Text className="text-sm text-slate-700">{item}</Text>
+              <View key={item.label} className="flex-row items-center gap-3 rounded-xl bg-slate-50 px-3 py-3">
+                <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: item.bg, alignItems: 'center', justifyContent: 'center' }}>
+                  <MaterialCommunityIcons name={item.icon as any} size={17} color={item.color} />
+                </View>
+                <Text className="text-sm text-slate-700 flex-1">{item.label}</Text>
               </View>
             ))}
           </View>
         </View>
       </ScrollView>
 
-      {/* 🔥 STICKY ACTIONS */}
+      {/* STICKY ACTIONS */}
       <View className="absolute bottom-0 left-0 right-0 bg-gray-100 px-4 pb-6 pt-2">
         <GradientButton title="View Health Plan" onPress={onViewPlan} />
 

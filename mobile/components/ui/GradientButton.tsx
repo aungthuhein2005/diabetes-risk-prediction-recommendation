@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import React from 'react';
 import { Pressable, Text } from 'react-native';
 
 type GradientButtonProps = {
