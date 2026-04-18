@@ -35,26 +35,6 @@ export default function Navbar() {
           <span className="text-sm font-bold tracking-tight">DiaPredict</span>
         </NavLink>
 
-        {/* Desktop nav */}
-        <nav className="hidden sm:flex items-center gap-0.5">
-          {navItems.map(({ to, label, icon: Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/'}
-              className={({ isActive }) =>
-                `flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-slate-100 text-slate-900'
-                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-                }`
-              }
-            >
-              <Icon className="h-4 w-4" />
-              {label}
-            </NavLink>
-          ))}
-        </nav>
 
         {/* Right: language switcher + profile */}
         <div className="flex items-center gap-3">
@@ -72,24 +52,6 @@ export default function Navbar() {
               >
                 {label}
               </button>
-            ))}
-          </div>
-
-          {/* Mobile nav icons */}
-          <div className="flex sm:hidden items-center gap-0.5">
-            {navItems.map(({ to, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === '/'}
-                className={({ isActive }) =>
-                  `flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
-                    isActive ? 'bg-slate-100 text-slate-900' : 'text-slate-400 hover:bg-slate-50'
-                  }`
-                }
-              >
-                <Icon className="h-4 w-4" />
-              </NavLink>
             ))}
           </div>
 

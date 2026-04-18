@@ -2,28 +2,26 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Markdown from 'react-native-markdown-display';
 import { Card } from '../components/ui/Card';
 import { GradientButton } from '../components/ui/GradientButton';
 import { downloadRecommendationPdf } from '../utils/pdfGenerator';
 import React from 'react';
+import type { AnalyzeResult } from './types';
 
 type RecommendationScreenProps = {
   onBack: () => void;
+  result: AnalyzeResult | null;
 };
 
-const predictionResult = {
-  risk: 'High',
-  probability: 0.7171334,
-  top_factors: [
-    { feature: 'Glucose', impact: 'High' },
-    { feature: 'Insulin', impact: 'High' },
-    { feature: 'Age', impact: 'High' },
-  ],
-  advice:
-    '1. **Simple Explanation**  \nYour risk level is high due to elevated glucose (blood sugar), insulin levels, and age. These factors are linked to conditions like diabetes, metabolic syndrome, or heart disease. While this doesn’t mean you have a specific illness, it highlights the need to address these risks early to protect your health.\n\n2. **Lifestyle Advice**  \n- **Diet**: Focus on whole foods (vegetables, lean proteins, whole grains) and limit refined sugars, processed foods, and sugary drinks.  \n- **Exercise**: Aim for 30–60 minutes of moderate activity (e.g., walking, swimming) most days to improve insulin sensitivity and glucose control.  \n- **Weight Management**: Even a 5–10% reduction in body weight can significantly lower blood sugar and insulin levels.  \n- **Sleep & Stress**: Prioritize 7–8 hours of sleep and practice stress-reduction techniques (e.g., meditation, yoga) to support metabolic health.  \n\n3. **Preventive Steps**  \n- **Monitor Health Metrics**: Regularly check blood sugar levels (if recommended by a healthcare provider) and track cholesterol or blood pressure.  \n- **Hydration**: Drink plenty of water to support kidney function and metabolism.  \n- **Avoid Harmful Habits**: Limit alcohol, quit smoking, and reduce sedentary behavior (e.g., screen time).  \n- **Stay Informed**: Learn about your family health history and discuss risks with a professional.  \n\n4. **Suggest Consulting a Doctor**  \nA healthcare provider can assess your risk through blood tests (e.g., HbA1c, lipid panel) and create a personalized plan. Early intervention can reduce complications and improve long-term outcomes.  \n\n**Note**: This guidance is not a diagnosis. Always consult a qualified healthcare professional for individualized care.',
-};
-
-export function RecommendationScreen({ onBack }: RecommendationScreenProps) {
+export function RecommendationScreen({ onBack, result }: RecommendationScreenProps) {
+  const predictionResult: AnalyzeResult = result ?? {
+    risk: 'Medium',
+    probability: 0,
+    top_factors: [],
+    advice:
+      'No recommendation data yet. Run an analysis first to generate personalized advice.',
+  };
   const probabilityPercent = (predictionResult.probability * 100).toFixed(1);
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -83,37 +81,9 @@ export function RecommendationScreen({ onBack }: RecommendationScreenProps) {
         </View>
 
         <SectionCard
-          title="Explanation"
-          icon={<MaterialCommunityIcons name="alert-circle" size={18} color="#2563eb" />}
-          content="Your risk level is high due to elevated glucose, insulin, and age. These are early warning indicators linked to diabetes and related metabolic conditions. It is not a confirmed diagnosis, but taking action now can protect long-term health."
-        />
-
-        <SectionCard
-          title="Action Plan"
-          icon={<MaterialCommunityIcons name="format-list-checks" size={18} color="#0891b2" />}
-          bulletItems={[
-            'Monitor blood sugar and blood pressure regularly.',
-            'Stay hydrated to support kidney and metabolic function.',
-            'Reduce sedentary time and avoid smoking or excess alcohol.',
-            'Track risk factors consistently and review trends monthly.',
-          ]}
-        />
-
-        <SectionCard
-          title="Lifestyle"
-          icon={<MaterialCommunityIcons name="heart-pulse" size={18} color="#16a34a" />}
-          bulletItems={[
-            'Diet: Focus on whole foods and reduce refined sugars.',
-            'Exercise: Aim for 30-60 minutes of moderate activity most days.',
-            'Weight: A 5-10% weight reduction can improve insulin response.',
-            'Sleep and Stress: Maintain 7-8 hours sleep and practice stress control.',
-          ]}
-        />
-
-        <SectionCard
-          title="Doctor Advice"
-          icon={<MaterialCommunityIcons name="stethoscope" size={18} color="#7c3aed" />}
-          content="Consult a healthcare provider for confirmatory tests such as HbA1c and lipid panel. A personalized medical plan can reduce complications and improve long-term outcomes."
+          title="Personalized Advice"
+          icon={<MaterialCommunityIcons name="medical-bag" size={18} color="#2563eb" />}
+          markdownContent={predictionResult.advice}
           footerText="Note: This guidance is not a diagnosis. Always consult a qualified healthcare professional for individualized care."
         />
       </ScrollView>
@@ -142,17 +112,33 @@ type SectionCardProps = {
   title: string;
   icon: ReactNode;
   content?: string;
+  markdownContent?: string;
   bulletItems?: string[];
   footerText?: string;
 };
 
-function SectionCard({ title, icon, content, bulletItems, footerText }: SectionCardProps) {
+function SectionCard({ title, icon, content, markdownContent, bulletItems, footerText }: SectionCardProps) {
   return (
     <Card className="mb-4">
       <View className="mb-2 flex-row items-center gap-2">
         {icon}
         <Text className="text-lg font-bold text-slate-800">{title}</Text>
       </View>
+
+      {markdownContent ? (
+        <Markdown
+          style={{
+            body: { color: '#334155', fontSize: 14, lineHeight: 22 },
+            paragraph: { marginTop: 0, marginBottom: 10 },
+            strong: { color: '#1f2937', fontWeight: '700' },
+            list_item: { marginBottom: 6 },
+            bullet_list: { marginBottom: 6 },
+            ordered_list: { marginBottom: 6 },
+          }}
+        >
+          {markdownContent}
+        </Markdown>
+      ) : null}
 
       {content ? <Text className="text-sm leading-6 text-slate-700">{content}</Text> : null}
 

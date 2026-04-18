@@ -11,9 +11,18 @@ type HabitScreenProps = {
   onAnswersChange: (next: HabitAnswers) => void;
   onAnalyze: () => void;
   onBack: () => void;
+  isAnalyzing?: boolean;
+  analysisError?: string | null;
 };
 
-export function HabitScreen({ answers, onAnswersChange, onAnalyze, onBack }: HabitScreenProps) {
+export function HabitScreen({
+  answers,
+  onAnswersChange,
+  onAnalyze,
+  onBack,
+  isAnalyzing = false,
+  analysisError = null,
+}: HabitScreenProps) {
   const updateNumber = (key: keyof HabitAnswers, value: number) => {
     onAnswersChange({ ...answers, [key]: value });
   };
@@ -67,7 +76,16 @@ export function HabitScreen({ answers, onAnswersChange, onAnalyze, onBack }: Hab
       </ScrollView>
 
       <View className="absolute bottom-0 left-0 right-0 bg-gray-100 px-4 pb-6 pt-2">
-        <GradientButton title="Analyze" variant="secondary" onPress={onAnalyze} />
+        {analysisError ? (
+          <Text className="mb-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+            {analysisError}
+          </Text>
+        ) : null}
+        <GradientButton
+          title={isAnalyzing ? 'Analyzing...' : 'Analyze'}
+          variant="secondary"
+          onPress={onAnalyze}
+        />
       </View>
     </View>
   );

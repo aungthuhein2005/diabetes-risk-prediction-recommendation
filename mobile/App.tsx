@@ -2,12 +2,13 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo, useState } from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { analyzeRisk } from './lib/api';
 import { AnalyzeScreen } from './screens/AnalyzeScreen';
 import { HabitScreen } from './screens/HabitScreen';
 import { HomeScreen } from './screens/HomeScreen';
+import { ProfileScreen } from './screens/ProfileScreen';
 import { RecommendationScreen } from './screens/RecommendationScreen';
-import { ScanScreen } from './screens/ScanScreen';
-import type { AppScreen, HabitAnswers } from './screens/types';
+import type { AnalyzeResult, AppScreen, HabitAnswers } from './screens/types';
 import './global.css';
 
 export default function App() {
@@ -23,6 +24,9 @@ export default function App() {
     DiabetesPedigreeFunction: 0.627,
     Age: 50,
   });
+  const [analysisResult, setAnalysisResult] = useState<AnalyzeResult | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   const habitsScore = useMemo(() => {
     const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
@@ -42,33 +46,66 @@ export default function App() {
 
   const analysisPercent = Math.max(1, habitsScore);
 
+  const runAnalysis = async () => {
+    setIsAnalyzing(true);
+    setAnalysisError(null);
+    try {
+      const result = await analyzeRisk(answers, 'en');
+      setAnalysisResult(result);
+      setCurrentScreen('analyze');
+    } catch (error) {
+      setAnalysisResult(null);
+      setAnalysisError(error instanceof Error ? error.message : 'Unable to connect to API.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const renderScreen = () => {
     switch (currentScreen) {
       case 'home':
-        return <HomeScreen onStartAssessment={() => setCurrentScreen('habit')} onScan={() => setCurrentScreen('scan')} />;
-      case 'scan':
-        return <ScanScreen onBack={() => setCurrentScreen('home')} />;
+        return (
+          <HomeScreen
+            onStartAssessment={() => setCurrentScreen('habit')}
+            onOpenProfile={() => setCurrentScreen('profile')}
+          />
+        );
       case 'habit':
         return (
           <HabitScreen
             answers={answers}
             onAnswersChange={setAnswers}
-            onAnalyze={() => setCurrentScreen('analyze')}
+            onAnalyze={runAnalysis}
             onBack={() => setCurrentScreen('home')}
+            isAnalyzing={isAnalyzing}
+            analysisError={analysisError}
           />
         );
       case 'analyze':
         return (
           <AnalyzeScreen
             analysisPercent={analysisPercent}
+            result={analysisResult}
             onViewPlan={() => setCurrentScreen('plan')}
             onRetake={() => setCurrentScreen('habit')}
           />
         );
       case 'plan':
-        return <RecommendationScreen onBack={() => setCurrentScreen('analyze')} />;
+        return (
+          <RecommendationScreen
+            onBack={() => setCurrentScreen('analyze')}
+            result={analysisResult}
+          />
+        );
+      case 'profile':
+        return <ProfileScreen onBack={() => setCurrentScreen('home')} />;
       default:
-        return <HomeScreen onStartAssessment={() => setCurrentScreen('habit')} onScan={() => setCurrentScreen('scan')} />;
+        return (
+          <HomeScreen
+            onStartAssessment={() => setCurrentScreen('habit')}
+            onOpenProfile={() => setCurrentScreen('profile')}
+          />
+        );
     }
   };
 

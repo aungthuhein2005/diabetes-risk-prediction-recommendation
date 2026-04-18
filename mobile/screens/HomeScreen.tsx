@@ -16,10 +16,10 @@ const translations = {
 
 type HomeScreenProps = {
   onStartAssessment: () => void;
-  onScan: () => void;
+  onOpenProfile: () => void;
 };
 
-export function HomeScreen({ onStartAssessment, onScan }: HomeScreenProps) {
+export function HomeScreen({ onStartAssessment, onOpenProfile }: HomeScreenProps) {
   const [fontsLoaded] = useFonts({
     PlaywriteIE_400Regular: require('../assets/fonts/PlaywriteIE_400Regular.ttf'),
   });
@@ -68,7 +68,10 @@ export function HomeScreen({ onStartAssessment, onScan }: HomeScreenProps) {
               <Text className="text-base">{translations[selectedLang].flag}</Text>
               <MaterialCommunityIcons name="chevron-down" size={16} color="#334155" />
             </Pressable>
-            <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-slate-200">
+            <Pressable
+              onPress={onOpenProfile}
+              className="h-10 w-10 items-center justify-center rounded-full bg-slate-200"
+            >
               <MaterialCommunityIcons name="account-outline" size={20} color="#334155" />
             </Pressable>
           </View>
@@ -189,43 +192,6 @@ export function HomeScreen({ onStartAssessment, onScan }: HomeScreenProps) {
                 </View>
               </Pressable>
             ))}
-          </View>
-        </View>
-
-        {/* AI SCAN SECTION */}
-        <View className="mb-4 rounded-2xl bg-white p-4">
-          <View className="mb-3 flex-row items-center gap-2">
-            <MaterialCommunityIcons name="line-scan" size={20} color="#0284c7" />
-            <Text className="text-base font-bold text-slate-800">AI Image Scanner</Text>
-          </View>
-          <Text className="mb-4 text-sm text-slate-500">
-            Detect diabetic risk indicators instantly using your camera or a photo from your gallery.
-          </Text>
-
-          <View className="flex-row gap-3">
-            {/* Camera Scan */}
-            <Pressable
-              onPress={onScan}
-              className="flex-1 rounded-xl bg-blue-50 p-3"
-            >
-              <View className="mb-2 h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
-                <MaterialCommunityIcons name="camera" size={20} color="#0284c7" />
-              </View>
-              <Text className="text-sm font-semibold text-blue-700">Camera</Text>
-              <Text className="text-xs text-blue-500">Take a photo</Text>
-            </Pressable>
-
-            {/* Gallery Scan */}
-            <Pressable
-              onPress={onScan}
-              className="flex-1 rounded-xl bg-emerald-50 p-3"
-            >
-              <View className="mb-2 h-10 w-10 items-center justify-center rounded-lg bg-emerald-100">
-                <MaterialCommunityIcons name="image" size={20} color="#059669" />
-              </View>
-              <Text className="text-sm font-semibold text-emerald-700">Gallery</Text>
-              <Text className="text-xs text-emerald-500">Upload image</Text>
-            </Pressable>
           </View>
         </View>
 

@@ -10,3 +10,10 @@ export type HabitAnswers = {
   Missing_Insulin: number
   Missing_SkinThickness: number
 }
+
+export type AnalyzeResult = {
+  risk: 'Low' | 'Medium' | 'High'
+  probability: number
+  top_factors: { feature: string; impact: string }[]
+  advice: string
+}

@@ -1,4 +1,4 @@
-export type AppScreen = 'home' | 'habit' | 'analyze' | 'plan' | 'scan';
+export type AppScreen = 'home' | 'habit' | 'analyze' | 'plan' | 'profile';
 
 export type HabitAnswers = {
   Pregnancies: number;
@@ -9,6 +9,13 @@ export type HabitAnswers = {
   BMI: number;
   DiabetesPedigreeFunction: number;
   Age: number;
+};
+
+export type AnalyzeResult = {
+  risk: 'Low' | 'Medium' | 'High';
+  probability: number;
+  top_factors: { feature: string; impact: string }[];
+  advice: string;
 };
 
 export type PlanTasks = {

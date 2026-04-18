@@ -4,7 +4,7 @@ import ProgressBar from '../components/ProgressBar'
 
 type RiskLevel = 'High' | 'Moderate' | 'Low'
 
-const user    = { name: 'Aung Thu Hein', email: 'aung@example.com', joined: 'January 2026', initials: 'AT' }
+const user    = { name: 'Max', email: 'max@example.com', joined: 'January 2026', initials: 'MAX' }
 const savedPlans: { id: number; date: string; risk: RiskLevel; probability: number; factors: string[] }[] = [
   { id: 1, date: 'Mar 29, 2026', risk: 'High',     probability: 71.7, factors: ['Glucose', 'Insulin', 'Age'] },
   { id: 2, date: 'Mar 15, 2026', risk: 'Moderate', probability: 44.2, factors: ['BMI', 'Blood Pressure'] },

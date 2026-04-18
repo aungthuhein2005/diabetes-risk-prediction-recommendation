@@ -1,38 +1,49 @@
 import { ArrowLeft, CircleAlert, Download, HeartPulse, ListChecks, Save, Stethoscope } from 'lucide-react'
 import { jsPDF } from 'jspdf'
 import { useState, type ReactNode } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
+import type { AnalyzeResult } from '../types/assessment'
 
-const planResult = {
-  risk: 'High',
-  probability: 0.7171334,
-  top_factors: [
-    { feature: 'Glucose', impact: 'High' },
-    { feature: 'Insulin', impact: 'High' },
-    { feature: 'Age',     impact: 'High' },
-  ],
+type PlanPageProps = {
+  result: AnalyzeResult | null
 }
 
 type SectionCardProps = {
   title: string; icon: ReactNode
-  content?: string; bulletItems?: string[]; footerText?: string
+  content?: string; markdownContent?: string; bulletItems?: string[]; footerText?: string
 }
 
-function SectionCard({ title, icon, content, bulletItems, footerText }: SectionCardProps) {
+function SectionCard({ title, icon, content, markdownContent, bulletItems, footerText }: SectionCardProps) {
   return (
     <div className="card p-5">
       <div className="mb-3 flex items-center gap-2.5 border-b border-slate-100 pb-3">
         <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-100 bg-slate-50">{icon}</div>
         <span className="text-sm font-semibold text-slate-800">{title}</span>
       </div>
+      {markdownContent && (
+        <div className="text-sm leading-relaxed text-slate-500">
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+              strong: ({ children }) => <strong className="font-semibold text-slate-700">{children}</strong>,
+              ul: ({ children }) => <ul className="mb-2 list-disc space-y-1 pl-5">{children}</ul>,
+              ol: ({ children }) => <ol className="mb-2 list-decimal space-y-1 pl-5">{children}</ol>,
+              li: ({ children }) => <li>{children}</li>,
+            }}
+          >
+            {markdownContent}
+          </ReactMarkdown>
+        </div>
+      )}
       {content && <p className="text-sm leading-relaxed text-slate-500">{content}</p>}
       {bulletItems && (
         <ul className="space-y-2">
           {bulletItems.map(item => (
             <li key={item} className="flex items-start gap-2 text-sm text-slate-500">
-              <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300" />
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-300" />
               {item}
             </li>
           ))}
@@ -43,11 +54,33 @@ function SectionCard({ title, icon, content, bulletItems, footerText }: SectionC
   )
 }
 
-export default function PlanPage() {
+export default function PlanPage({ result }: PlanPageProps) {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [downloading, setDownloading] = useState(false)
+  const planResult: AnalyzeResult = result ?? {
+    risk: 'Medium',
+    probability: 0,
+    top_factors: [],
+    advice: 'No recommendation data yet. Run analysis first to generate a personalized plan.',
+  }
   const pctStr = (planResult.probability * 100).toFixed(1)
+
+  const markdownToPlainText = (input: string) =>
+    input
+      .replace(/\r/g, '')
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/!\[[^\]]*]\([^)]*\)/g, '')
+      .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
+      .replace(/^#{1,6}\s*/gm, '')
+      .replace(/^\s*[-*+]\s+/gm, '- ')
+      .replace(/^\s*\d+\.\s+/gm, '')
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/_([^_]+)_/g, '$1')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
 
   const handleDownloadPdf = () => {
     setDownloading(true)
@@ -61,9 +94,12 @@ export default function PlanPage() {
       pdf.text(`Risk: ${planResult.risk}`, left, y); y += 18
       pdf.text(`Probability: ${pctStr}%`, left, y); y += 18
       pdf.text(`Factors: ${planResult.top_factors.map(f => `${f.feature} (${f.impact})`).join(', ')}`, left, y); y += 24
+      pdf.text(`Date: ${new Date().toLocaleDateString()}`, left, y); y += 18
+      pdf.text(`Time: ${new Date().toLocaleTimeString()}`, left, y); y += 18
       pdf.setFont('helvetica', 'bold').setFontSize(13); pdf.text('Advice', left, y); y += 18
       pdf.setFont('helvetica', 'normal').setFontSize(11)
-      const wrapped = pdf.splitTextToSize(t('plan.explanationText'), maxW)
+      const plainAdvice = markdownToPlainText(planResult.advice)
+      const wrapped = pdf.splitTextToSize(plainAdvice, maxW)
       pdf.text(wrapped, left, y)
       pdf.save(`diapredict-${planResult.risk.toLowerCase()}-plan.pdf`)
     } finally { setDownloading(false) }
@@ -109,28 +145,13 @@ export default function PlanPage() {
       </div>
 
       {/* Section cards */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="">
         <SectionCard
           title={t('plan.explanation')}
           icon={<CircleAlert className="h-4 w-4 text-blue-500" />}
-          content={t('plan.explanationText')}
+          markdownContent={planResult.advice}
         />
-        <SectionCard
-          title={t('plan.actionPlan')}
-          icon={<ListChecks className="h-4 w-4 text-cyan-500" />}
-          bulletItems={[t('plan.action1'), t('plan.action2'), t('plan.action3'), t('plan.action4')]}
-        />
-        <SectionCard
-          title={t('plan.lifestyle')}
-          icon={<HeartPulse className="h-4 w-4 text-emerald-500" />}
-          bulletItems={[t('plan.life1'), t('plan.life2'), t('plan.life3'), t('plan.life4')]}
-        />
-        <SectionCard
-          title={t('plan.medAdvice')}
-          icon={<Stethoscope className="h-4 w-4 text-violet-500" />}
-          content={t('plan.medText')}
-          footerText={t('plan.medFooter')}
-        />
+       
       </div>
 
       {/* Actions */}

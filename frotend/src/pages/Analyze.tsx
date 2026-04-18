@@ -2,22 +2,33 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import ProgressBar from '../components/ProgressBar'
+import type { AnalyzeResult } from '../types/assessment'
+import Button from '../components/Button'
 
-type AnalyzePageProps = { analysisPercent: number }
+type AnalyzePageProps = { analysisPercent: number; result: AnalyzeResult | null }
 
-export default function AnalyzePage({ analysisPercent }: AnalyzePageProps) {
+export default function AnalyzePage({ analysisPercent, result }: AnalyzePageProps) {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const pct = Math.max(0, Math.min(analysisPercent, 100))
+  const pct = Math.max(
+    0,
+    Math.min(result ? Math.round(result.probability * 100) : analysisPercent, 100),
+  )
 
   const size = 200, segments = 44, filled = Math.round((pct / 100) * segments)
   const radius = 70, segW = 7, segH = 16, cx = size / 2
 
-  const risk = pct > 65
-    ? { label: t('analyze.riskHigh'), cls: 'badge-high', color: '#dc2626', bar: 'bg-red-500'     }
-    : pct > 35
-    ? { label: t('analyze.riskMod'),  cls: 'badge-mod',  color: '#d97706', bar: 'bg-amber-400'  }
-    : { label: t('analyze.riskLow'),  cls: 'badge-low',  color: '#059669', bar: 'bg-emerald-500' }
+  const risk = result?.risk === 'High'
+    ? { label: t('analyze.riskHigh'), cls: 'badge-high', color: '#dc2626', bar: 'bg-red-500' }
+    : result?.risk === 'Medium'
+      ? { label: t('analyze.riskMod'), cls: 'badge-mod', color: '#d97706', bar: 'bg-amber-400' }
+      : result?.risk === 'Low'
+        ? { label: t('analyze.riskLow'), cls: 'badge-low', color: '#059669', bar: 'bg-emerald-500' }
+        : pct > 65
+          ? { label: t('analyze.riskHigh'), cls: 'badge-high', color: '#dc2626', bar: 'bg-red-500' }
+          : pct > 35
+            ? { label: t('analyze.riskMod'), cls: 'badge-mod', color: '#d97706', bar: 'bg-amber-400' }
+            : { label: t('analyze.riskLow'), cls: 'badge-low', color: '#059669', bar: 'bg-emerald-500' }
 
   const breakdown = [
     { labelKey: 'analyze.metabolic', pct },
@@ -44,10 +55,10 @@ export default function AnalyzePage({ analysisPercent }: AnalyzePageProps) {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-5">
+      <div className="flex flex-col items-center gap-6">
 
         {/* Ring chart */}
-        <div className="card flex flex-col items-center p-6 lg:col-span-2">
+        <div className="card flex w-full max-w-md flex-col items-center p-6">
           <div style={{ width: size, height: size, position: 'relative' }} className="flex items-center justify-center">
             <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ position: 'absolute', inset: 0 }}>
               {Array.from({ length: segments }).map((_, i) => {
@@ -70,65 +81,19 @@ export default function AnalyzePage({ analysisPercent }: AnalyzePageProps) {
                 {risk.label}
               </span>
             </div>
+            
           </div>
+          <Button
+          onClick={() => navigate('/plan')}
+          className="mt-6 "
+        >
+          {t('analyze.viewPlan')}
+        </Button>
           <p className="mt-4 text-center text-xs text-slate-400">{t('analyze.chartCaption')}</p>
+          
         </div>
-
-        {/* Info panel */}
-        <div className="space-y-5 lg:col-span-3">
-
-          <div className="card p-5">
-            <p className="mb-4 text-sm font-semibold text-slate-700">{t('analyze.breakdownTitle')}</p>
-            <div className="space-y-4">
-              {breakdown.map(b => (
-                <div key={b.labelKey}>
-                  <div className="mb-1.5 flex justify-between text-xs">
-                    <span className="text-slate-500">{t(b.labelKey)}</span>
-                    <span className="font-semibold tabular-nums text-slate-700">{b.pct}%</span>
-                  </div>
-                  <ProgressBar value={b.pct} color={risk.bar} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="card p-5">
-            <p className="mb-2 text-sm font-semibold text-slate-700">{t('analyze.meansTitle')}</p>
-            <p className="text-sm leading-relaxed text-slate-500">{t('analyze.meansText')}</p>
-          </div>
-
-          <div className="card p-5">
-            <p className="mb-3 text-sm font-semibold text-slate-700">{t('analyze.recoTitle')}</p>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {recoKeys.map(k => (
-                <div key={k} className="flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
-                  <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
-                  <span className="text-xs text-slate-600">{t(`analyze.${k}`)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex gap-2.5">
-            <button
-              onClick={() => navigate('/plan')}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 active:bg-blue-800"
-            >
-              {t('analyze.viewPlan')}
-              <ArrowRight className="h-4 w-4 flex-shrink-0" />
-            </button>
-            <button
-              onClick={() => navigate('/habit')}
-              className="flex items-center justify-center rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 active:bg-slate-100"
-            >
-              {t('common.retake')}
-            </button>
-          </div>
-        </div>
+       
       </div>
-
-      <p className="mt-6 text-center text-[11px] text-slate-400">{t('analyze.disclaimer')}</p>
     </div>
-  )
+  );
 }
